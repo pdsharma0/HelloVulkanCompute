@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+#include <iostream>
+
+/*
+   This is a simple compute example written in Vulkan.
+   All it does is copy contents from a Src buffer to a Dst.
+*/
 
 // -------------- Macros --------------
 #define CHECK_RESULT(result) \
@@ -11,6 +17,25 @@
 VkInstance				g_Instance;
 VkPhysicalDevice		g_PhysicalDevice;
 VkDevice				g_Device;
+VkBuffer				g_deviceSrcBuffer;
+VkBuffer				g_deviceDstBuffer;
+
+// -------------- Constants --------------
+const size_t bufferLength = 1024;
+
+// 1. This is based on DeviceProperties.txt
+//	  This memory's heap is ~ 4 GiB and has both VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bits set
+//	  So we can use vkMapMemory to write data to Src buffer and also read data from Dst buffer
+// 2. This is slower though, and the memory to use is type=0 one which has VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT bit set instead and is 
+//	  backed by up ~8 GiB of GPU video-memory-heap. But since we cannot use vkMapBuffer as it's not host visible, we'd need a staging buffer 
+//    to copy data between host and device though, that's where the memory type=2 comes in.
+// 3. The staging buffer memory's heap is sized around 256 MiB and has all 3 flags set: 
+//	  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+// Some resources for future:
+// https://vulkan-tutorial.com/Vertex_buffers/Staging_buffer
+// https://developer.nvidia.com/vulkan-memory-management
+// https://software.intel.com/en-us/articles/api-without-secrets-introduction-to-vulkan-part-5
+const unsigned memoryTypeIdx = 1; 
 
 // ----------------------------
 // Create vkInstance
@@ -134,11 +159,50 @@ void DestroyDevice() {
 	printf("VkDevice sucessfully destroyed!\n");
 }
 
+// --------------------------------------------------------
+// Create and Allocate Src and Dst Buffers
+// --------------------------------------------------------
+void CreateAndAllocateBuffers() {
+
+	VkResult result = {};
+
+	// First create a vkBufferCreateInfo struct which is used in vkCreateBuffer 
+	VkBufferCreateInfo bufferCreateInfo = {};
+	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferCreateInfo.size = sizeof(unsigned) * bufferLength;
+	bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	// Create Src Buffer
+	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_deviceSrcBuffer);
+	CHECK_RESULT(result);
+
+	// Create Dst Buffer
+	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_deviceDstBuffer);
+	CHECK_RESULT(result);
+
+	// Get the memory requirements of the buffers 
+	// This is to find a suitable memory-heap for the buffer for its allocation
+	VkMemoryRequirements mr;
+	vkGetBufferMemoryRequirements(g_Device, g_deviceSrcBuffer, &mr);
+	std::cout << "Src buffer" << " Size: " << mr.size << " Alignment: " << mr.alignment << " MemoryBits: " << mr.memoryTypeBits << std::endl;
+
+	vkGetBufferMemoryRequirements(g_Device, g_deviceDstBuffer, &mr);
+	std::cout << "Dst buffer" << " Size: " << mr.size << " Alignment: " << mr.alignment << " MemoryBits: " << mr.memoryTypeBits << std::endl;
+
+	
+
+	// Allocate memory
+
+
+	// Assign memory to buffers
+}
+
 int main() {
 	CreateInstance();
 	CreateDevice();
 
-
+	CreateAndAllocateBuffers();
 
 	DestroyDevice();
 	DestroyInstance();
