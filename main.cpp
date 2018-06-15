@@ -19,9 +19,10 @@ VkPhysicalDevice		g_PhysicalDevice;
 VkDevice				g_Device;
 VkBuffer				g_deviceSrcBuffer;
 VkBuffer				g_deviceDstBuffer;
+VkDeviceMemory			g_DeviceMemory;
 
 // -------------- Constants --------------
-const size_t bufferLength = 1024;
+const unsigned bufferLength = 1024;
 
 // 1. This is based on DeviceProperties.txt
 //	  This memory's heap is ~ 4 GiB and has both VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bits set
@@ -35,7 +36,7 @@ const size_t bufferLength = 1024;
 // https://vulkan-tutorial.com/Vertex_buffers/Staging_buffer
 // https://developer.nvidia.com/vulkan-memory-management
 // https://software.intel.com/en-us/articles/api-without-secrets-introduction-to-vulkan-part-5
-const unsigned memoryTypeIdx = 1; 
+const unsigned memoryTypeIdx = 1;
 
 // ----------------------------
 // Create vkInstance
@@ -160,9 +161,9 @@ void DestroyDevice() {
 }
 
 // --------------------------------------------------------
-// Create and Allocate Src and Dst Buffers
+// Create Src and Dst Buffers
 // --------------------------------------------------------
-void CreateAndAllocateBuffers() {
+void CreateBuffers() {
 
 	VkResult result = {};
 
@@ -181,28 +182,53 @@ void CreateAndAllocateBuffers() {
 	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_deviceDstBuffer);
 	CHECK_RESULT(result);
 
+	printf("Buffers sucessfully created!\n");
+}
+
+// --------------------------------------------------------
+// Allocate Src and Dst Buffers
+// --------------------------------------------------------
+void AllocateBuffers() {
 	// Get the memory requirements of the buffers 
 	// This is to find a suitable memory-heap for the buffer for its allocation
-	VkMemoryRequirements mr;
-	vkGetBufferMemoryRequirements(g_Device, g_deviceSrcBuffer, &mr);
-	std::cout << "Src buffer" << " Size: " << mr.size << " Alignment: " << mr.alignment << " MemoryBits: " << mr.memoryTypeBits << std::endl;
+	VkMemoryRequirements srcMemoryRequirements;
+	vkGetBufferMemoryRequirements(g_Device, g_deviceSrcBuffer, &srcMemoryRequirements);
 
-	vkGetBufferMemoryRequirements(g_Device, g_deviceDstBuffer, &mr);
-	std::cout << "Dst buffer" << " Size: " << mr.size << " Alignment: " << mr.alignment << " MemoryBits: " << mr.memoryTypeBits << std::endl;
-
-	
+	VkMemoryRequirements dstMemoryRequirements;
+	vkGetBufferMemoryRequirements(g_Device, g_deviceDstBuffer, &dstMemoryRequirements);
 
 	// Allocate memory
+	VkMemoryAllocateInfo memAllocInfo = {};
+	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memAllocInfo.allocationSize = srcMemoryRequirements.size + dstMemoryRequirements.size;
+	memAllocInfo.memoryTypeIndex = memoryTypeIdx;
 
+	VkResult result = vkAllocateMemory(g_Device, &memAllocInfo, NULL, &g_DeviceMemory);
+	CHECK_RESULT(result);
 
-	// Assign memory to buffers
+	// Bind memory to buffers
+	result = vkBindBufferMemory(g_Device, g_deviceSrcBuffer, g_DeviceMemory, 0);
+	CHECK_RESULT(result);
+
+	result = vkBindBufferMemory(g_Device, g_deviceSrcBuffer, g_DeviceMemory, srcMemoryRequirements.size);
+	CHECK_RESULT(result);
+
+	printf("Buffers sucessfully allocated!\n");
+}
+
+// --------------------------------------------------------
+// Allocate Src Buffer
+// --------------------------------------------------------
+void InitializeSrcBuffer() {
+
 }
 
 int main() {
 	CreateInstance();
 	CreateDevice();
 
-	CreateAndAllocateBuffers();
+	CreateBuffers();
+	AllocateBuffers();
 
 	DestroyDevice();
 	DestroyInstance();
