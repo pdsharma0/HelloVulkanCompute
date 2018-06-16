@@ -15,21 +15,26 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="DeviceProperties.txt">
+    <Image Include="resources\MemoryMapping.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resources\rx480_vulkan_features.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="TODO.txt">
+    <Text Include="resources\todo.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="MemoryMapping.png">
-      <Filter>Resource Files</Filter>
-    </Image>
+    <ClInclude Include="src\Utils.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

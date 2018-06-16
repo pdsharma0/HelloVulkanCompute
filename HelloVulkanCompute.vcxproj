@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\VulkanSDK\1.1.73.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -80,7 +80,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.73.0\Lib32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib32</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -122,14 +122,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="DeviceProperties.txt" />
-    <Text Include="TODO.txt" />
+    <Image Include="resources\MemoryMapping.png" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="MemoryMapping.png" />
+    <Text Include="resources\rx480_vulkan_features.txt" />
+    <Text Include="resources\todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
