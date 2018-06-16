@@ -20,11 +20,11 @@ VkDevice				g_Device;
 
 /* Src Buffer parameters */
 VkBuffer				g_SrcBuffer;
-VkDeviceSize            g_SrcBufferOffset;
+VkDeviceSize			g_SrcBufferOffset;
 
 /* Dst Buffer parameters */
 VkBuffer				g_DstBuffer;
-VkDeviceSize            g_DstBufferOffset;
+VkDeviceSize			g_DstBufferOffset;
 
 VkDeviceMemory			g_DeviceMemory;
 
