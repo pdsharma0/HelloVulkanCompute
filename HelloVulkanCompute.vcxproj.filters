@@ -28,7 +28,7 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\Downloads\Memory.png">
+    <Image Include="MemoryMapping.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
