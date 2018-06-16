@@ -20,10 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Flow.txt">
+    <Text Include="DeviceProperties.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="DeviceProperties.txt">
+    <Text Include="TODO.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

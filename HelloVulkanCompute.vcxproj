@@ -126,7 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="DeviceProperties.txt" />
-    <Text Include="Flow.txt" />
+    <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="MemoryMapping.png" />

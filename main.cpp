@@ -9,9 +9,84 @@
    All it does is copy contents from a Src buffer to a Dst.
 */
 
+const char* GetVulkanErrorString(VkResult result) {
+	switch (result) {
+		case VK_SUCCESS:
+			return "VK_SUCCESS";
+		case VK_NOT_READY:
+			return "VK_NOT_READY";
+		case VK_TIMEOUT:
+			return "VK_TIMEOUT";
+		case VK_EVENT_SET:
+			return "VK_EVENT_SET";
+		case VK_EVENT_RESET:
+			return "VK_EVENT_RESET";
+		case VK_INCOMPLETE:
+			return "VK_INCOMPLETE";
+		case VK_ERROR_OUT_OF_HOST_MEMORY:
+			return "VK_ERROR_OUT_OF_HOST_MEMORY";
+		case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+			return "VK_ERROR_OUT_OF_DEVICE_MEMORY";
+		case VK_ERROR_INITIALIZATION_FAILED:
+			return "VK_ERROR_INITIALIZATION_FAILED";
+		case VK_ERROR_DEVICE_LOST:
+			return "VK_ERROR_DEVICE_LOST";
+		case VK_ERROR_MEMORY_MAP_FAILED:
+			return "VK_ERROR_MEMORY_MAP_FAILED";
+		case VK_ERROR_LAYER_NOT_PRESENT:
+			return "VK_ERROR_LAYER_NOT_PRESENT";
+		case VK_ERROR_EXTENSION_NOT_PRESENT:
+			return "VK_ERROR_EXTENSION_NOT_PRESENT";
+		case VK_ERROR_FEATURE_NOT_PRESENT:
+			return "VK_ERROR_FEATURE_NOT_PRESENT";
+		case VK_ERROR_INCOMPATIBLE_DRIVER:
+			return "VK_ERROR_INCOMPATIBLE_DRIVER";
+		case VK_ERROR_TOO_MANY_OBJECTS:
+			return "VK_ERROR_TOO_MANY_OBJECTS";
+		case VK_ERROR_FORMAT_NOT_SUPPORTED:
+			return "VK_ERROR_FORMAT_NOT_SUPPORTED";
+		case VK_ERROR_FRAGMENTED_POOL:
+			return "VK_ERROR_FRAGMENTED_POOL";
+		case VK_ERROR_OUT_OF_POOL_MEMORY:
+			return "VK_ERROR_OUT_OF_POOL_MEMORY";
+		case VK_ERROR_INVALID_EXTERNAL_HANDLE:
+			return "VK_ERROR_INVALID_EXTERNAL_HANDLE";
+		case VK_ERROR_SURFACE_LOST_KHR:
+			return "VK_ERROR_SURFACE_LOST_KHR";
+		case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
+			return "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR";
+		case VK_SUBOPTIMAL_KHR:
+			return "VK_SUBOPTIMAL_KHR";
+		case VK_ERROR_OUT_OF_DATE_KHR:
+			return "VK_ERROR_OUT_OF_DATE_KHR";
+		case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR:
+			return "VK_ERROR_INCOMPATIBLE_DISPLAY_KHR";
+		case VK_ERROR_VALIDATION_FAILED_EXT:
+			return "VK_ERROR_VALIDATION_FAILED_EXT";
+		case VK_ERROR_INVALID_SHADER_NV:
+			return "VK_ERROR_INVALID_SHADER_NV";
+		case VK_ERROR_FRAGMENTATION_EXT:
+			return "VK_ERROR_FRAGMENTATION_EXT";
+		case VK_ERROR_NOT_PERMITTED_EXT:
+			return "VK_ERROR_NOT_PERMITTED_EXT";
+		case VK_RESULT_RANGE_SIZE:
+			return "VK_RESULT_RANGE_SIZE";
+		case VK_RESULT_MAX_ENUM:
+			return "VK_RESULT_MAX_ENUM";
+		default:
+			return "None";
+	}
+}
+
 // -------------- Macros --------------
-#define CHECK_RESULT(result) \
-  if (VK_SUCCESS != (result)) { printf("Failure at %u %s\n", __LINE__, __FILE__); exit(-1); }
+#define MESSAGE(...) printf(__VA_ARGS__);
+
+#define VK_CHECK_RESULT(result) \
+	if (VK_SUCCESS != result) \
+	{ \
+		MESSAGE("Vulkan error!\tErrorCode:%s (File:%s,LINE:%u)\n", GetVulkanErrorString(result), __FILE__, __LINE__); \
+		exit(-1); \
+	} \
 
  // -------------- Globals --------------
 VkInstance				g_Instance;
@@ -52,19 +127,12 @@ const unsigned memoryTypeIdx = 1;
 void CreateInstance() {
 
 	// Setup a vkInstanceCreateInfo struct
-	VkInstanceCreateInfo instanceInfo;
+	VkInstanceCreateInfo instanceInfo = {};
 	instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	instanceInfo.pNext = NULL;
-	instanceInfo.flags = 0;
-	instanceInfo.pApplicationInfo = NULL;
-	instanceInfo.enabledLayerCount = 0;
-	instanceInfo.ppEnabledLayerNames = NULL;
-	instanceInfo.enabledExtensionCount = 0;
-	instanceInfo.ppEnabledExtensionNames = NULL;
 
 	// No allocater needed for now...
 	VkResult result = vkCreateInstance(&instanceInfo, NULL, &g_Instance);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 
 	printf("VkInstance created!\n");
 }
@@ -85,12 +153,12 @@ void CreateDevice() {
 	// Enumerate all the physical devices present in the system
 	unsigned nPhysicalDevices = 0;
 	VkResult result = vkEnumeratePhysicalDevices(g_Instance, &nPhysicalDevices, NULL);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 
 	// Get all physical devices
 	VkPhysicalDevice* pPhysicalDevices = new VkPhysicalDevice[nPhysicalDevices];
 	result = vkEnumeratePhysicalDevices(g_Instance, &nPhysicalDevices, pPhysicalDevices);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 
 	// Get each physical device's properties
 	for (unsigned i = 0; i < nPhysicalDevices; i++) {
@@ -132,30 +200,21 @@ void CreateDevice() {
 	float queuePriority = 1.0;
 
 	// Setup VkDeviceQueueCreateInfo struct before setting up a vkDeviceCreationInfo struct
-	VkDeviceQueueCreateInfo queueCreateInfo;
+	VkDeviceQueueCreateInfo queueCreateInfo = {};
 	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	queueCreateInfo.pNext = NULL;
-	queueCreateInfo.flags = 0;
 	queueCreateInfo.queueFamilyIndex = idxQueue;
 	queueCreateInfo.queueCount = 1;	// Only a single compute queue for now
 	queueCreateInfo.pQueuePriorities = &queuePriority;
 
 	// Setup vkDeviceCreationInfo struct before setting up a device
-	VkDeviceCreateInfo deviceCreateInfo;
+	VkDeviceCreateInfo deviceCreateInfo = {};
 	deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	deviceCreateInfo.pNext = NULL;
-	deviceCreateInfo.flags = 0;
 	deviceCreateInfo.queueCreateInfoCount = 1; 
 	deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-	deviceCreateInfo.enabledLayerCount = 0;
-	deviceCreateInfo.ppEnabledLayerNames = NULL;
-	deviceCreateInfo.enabledExtensionCount = 0;
-	deviceCreateInfo.ppEnabledExtensionNames = NULL;
-	deviceCreateInfo.pEnabledFeatures = NULL;
 
 	// Select the first physical device to create a device
 	result = vkCreateDevice(g_PhysicalDevice, &deviceCreateInfo, NULL, &g_Device);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 
 	printf("VkDevice created!\n");
 }
@@ -184,11 +243,11 @@ void CreateBuffers() {
 
 	// Create Src Buffer
 	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_SrcBuffer);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 	
 	// Create Dst Buffer
 	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_DstBuffer);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 
 	printf("Buffers created!\n");
 }
@@ -212,7 +271,7 @@ void AllocateBuffers() {
 	memAllocInfo.memoryTypeIndex = memoryTypeIdx;
 
 	VkResult result = vkAllocateMemory(g_Device, &memAllocInfo, NULL, &g_DeviceMemory);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 
 	// Store the buffers next to each other
 	g_SrcBufferOffset = 0;
@@ -220,10 +279,10 @@ void AllocateBuffers() {
 
 	// Bind memory to buffers
 	result = vkBindBufferMemory(g_Device, g_SrcBuffer, g_DeviceMemory, g_SrcBufferOffset);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 
 	result = vkBindBufferMemory(g_Device, g_DstBuffer, g_DeviceMemory, g_DstBufferOffset);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 
 	printf("Buffers allocated!\n");
 }
@@ -233,10 +292,14 @@ void AllocateBuffers() {
 // --------------------------------------------------------
 void InitializeSrcBuffer() {
 
-	unsigned* pData;
+	unsigned* pData = nullptr;
 	// Map the Src Buffer to CPU Memory
 	VkResult result = vkMapMemory(g_Device, g_DeviceMemory, g_SrcBufferOffset, bufferSize, 0, (void**)&pData);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
+
+	if (pData == nullptr) {
+
+	}
 
 	// Fill the buffer with some data
 	for (unsigned i = 0; i < bufferLength; i++) {
@@ -244,7 +307,7 @@ void InitializeSrcBuffer() {
 	}
 
 	vkUnmapMemory(g_Device, g_DeviceMemory);
-	CHECK_RESULT(result);
+	VK_CHECK_RESULT(result);
 
 	printf("Src Buffer initialized!\n");
 }
