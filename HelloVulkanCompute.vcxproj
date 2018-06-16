@@ -134,6 +134,9 @@
   <ItemGroup>
     <ClInclude Include="src\Utils.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="SimpleCopy.cl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
