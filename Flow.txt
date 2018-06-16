@@ -1,9 +1,8 @@
-﻿1. vkCreateInstance() → vkEnumeratePhysicalDevices() → vkCreateDevice()
-2. Create appropriate VkBuffer objects for input and output.
-3. vkAllocateMemory() for these buffers.
-4. Host visible memory can be mapped for update - vkMapMemory()/vkUnmapMemory() are familiar functions. 
-All maps are by definition persistent, and as long as you synchronise it's legal to have memory mapped while in use by the GPU.
-5. Submit work using VkCommandBuffer. A VkCommandBuffer isn't created directly, it is allocated from a VkCommandPool
-6. Command buffers are submitted to a VkQueue. Use vkGetDeviceQueue() and vkQueueSubmit() functions.
-7. VkPipeline, vkCreateComputePipelines()
-8. VkShaderModule
+﻿[x] vkCreateInstance() → vkEnumeratePhysicalDevices() → vkCreateDevice()
+[x] Create appropriate VkBuffer objects for input and output.
+[x] vkAllocateMemory() for these buffers.
+[x] vkMapMemory()/vkUnmapMemory()
+[ ] VkPipeline, vkCreateComputePipelines()
+[ ] VkShaderModule
+[ ] Submit work using VkCommandBuffer. A VkCommandBuffer isn't created directly, it is allocated from a VkCommandPool
+[ ] Command buffers are submitted to a VkQueue. Use vkGetDeviceQueue() and vkQueueSubmit() functions.

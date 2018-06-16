@@ -17,12 +17,20 @@
 VkInstance				g_Instance;
 VkPhysicalDevice		g_PhysicalDevice;
 VkDevice				g_Device;
-VkBuffer				g_deviceSrcBuffer;
-VkBuffer				g_deviceDstBuffer;
+
+/* Src Buffer parameters */
+VkBuffer				g_SrcBuffer;
+VkDeviceSize            g_SrcBufferOffset;
+
+/* Dst Buffer parameters */
+VkBuffer				g_DstBuffer;
+VkDeviceSize            g_DstBufferOffset;
+
 VkDeviceMemory			g_DeviceMemory;
 
 // -------------- Constants --------------
 const unsigned bufferLength = 1024;
+const unsigned bufferSize = sizeof(unsigned) * bufferLength;
 
 // 1. This is based on DeviceProperties.txt
 //	  This memory's heap is ~ 4 GiB and has both VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bits set
@@ -58,7 +66,7 @@ void CreateInstance() {
 	VkResult result = vkCreateInstance(&instanceInfo, NULL, &g_Instance);
 	CHECK_RESULT(result);
 
-	printf("VkInstance sucessfully created!\n");
+	printf("VkInstance created!\n");
 }
 
 // ----------------------------
@@ -66,7 +74,7 @@ void CreateInstance() {
 // ----------------------------
 void DestroyInstance() {
 	vkDestroyInstance(g_Instance, NULL);
-	printf("VkInstance sucessfully destroyed!\n");
+	printf("VkInstance destroyed!\n");
 }
 
 // ----------------------------
@@ -149,7 +157,7 @@ void CreateDevice() {
 	result = vkCreateDevice(g_PhysicalDevice, &deviceCreateInfo, NULL, &g_Device);
 	CHECK_RESULT(result);
 
-	printf("VkDevice sucessfully created!\n");
+	printf("VkDevice created!\n");
 }
 
 // ----------------------------
@@ -157,7 +165,7 @@ void CreateDevice() {
 // ----------------------------
 void DestroyDevice() {
 	vkDestroyDevice(g_Device, NULL);
-	printf("VkDevice sucessfully destroyed!\n");
+	printf("VkDevice destroyed!\n");
 }
 
 // --------------------------------------------------------
@@ -170,19 +178,19 @@ void CreateBuffers() {
 	// First create a vkBufferCreateInfo struct which is used in vkCreateBuffer 
 	VkBufferCreateInfo bufferCreateInfo = {};
 	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferCreateInfo.size = sizeof(unsigned) * bufferLength;
+	bufferCreateInfo.size = bufferSize;
 	bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	// Create Src Buffer
-	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_deviceSrcBuffer);
+	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_SrcBuffer);
 	CHECK_RESULT(result);
-
+	
 	// Create Dst Buffer
-	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_deviceDstBuffer);
+	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_DstBuffer);
 	CHECK_RESULT(result);
 
-	printf("Buffers sucessfully created!\n");
+	printf("Buffers created!\n");
 }
 
 // --------------------------------------------------------
@@ -192,28 +200,32 @@ void AllocateBuffers() {
 	// Get the memory requirements of the buffers 
 	// This is to find a suitable memory-heap for the buffer for its allocation
 	VkMemoryRequirements srcMemoryRequirements;
-	vkGetBufferMemoryRequirements(g_Device, g_deviceSrcBuffer, &srcMemoryRequirements);
+	vkGetBufferMemoryRequirements(g_Device, g_SrcBuffer, &srcMemoryRequirements);
 
 	VkMemoryRequirements dstMemoryRequirements;
-	vkGetBufferMemoryRequirements(g_Device, g_deviceDstBuffer, &dstMemoryRequirements);
+	vkGetBufferMemoryRequirements(g_Device, g_DstBuffer, &dstMemoryRequirements);
 
 	// Allocate memory
 	VkMemoryAllocateInfo memAllocInfo = {};
 	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memAllocInfo.allocationSize = srcMemoryRequirements.size + dstMemoryRequirements.size;
+	memAllocInfo.allocationSize = 2 * bufferSize;
 	memAllocInfo.memoryTypeIndex = memoryTypeIdx;
 
 	VkResult result = vkAllocateMemory(g_Device, &memAllocInfo, NULL, &g_DeviceMemory);
 	CHECK_RESULT(result);
 
+	// Store the buffers next to each other
+	g_SrcBufferOffset = 0;
+	g_DstBufferOffset = bufferSize;
+
 	// Bind memory to buffers
-	result = vkBindBufferMemory(g_Device, g_deviceSrcBuffer, g_DeviceMemory, 0);
+	result = vkBindBufferMemory(g_Device, g_SrcBuffer, g_DeviceMemory, g_SrcBufferOffset);
 	CHECK_RESULT(result);
 
-	result = vkBindBufferMemory(g_Device, g_deviceSrcBuffer, g_DeviceMemory, srcMemoryRequirements.size);
+	result = vkBindBufferMemory(g_Device, g_DstBuffer, g_DeviceMemory, g_DstBufferOffset);
 	CHECK_RESULT(result);
 
-	printf("Buffers sucessfully allocated!\n");
+	printf("Buffers allocated!\n");
 }
 
 // --------------------------------------------------------
@@ -221,14 +233,35 @@ void AllocateBuffers() {
 // --------------------------------------------------------
 void InitializeSrcBuffer() {
 
+	unsigned* pData;
+	// Map the Src Buffer to CPU Memory
+	VkResult result = vkMapMemory(g_Device, g_DeviceMemory, g_SrcBufferOffset, bufferSize, 0, (void**)&pData);
+	CHECK_RESULT(result);
+
+	// Fill the buffer with some data
+	for (unsigned i = 0; i < bufferLength; i++) {
+		pData[i] = i;
+	}
+
+	vkUnmapMemory(g_Device, g_DeviceMemory);
+	CHECK_RESULT(result);
+
+	printf("Src Buffer initialized!\n");
 }
 
 int main() {
+
+	/* Device */
 	CreateInstance();
 	CreateDevice();
 
+	/* Memory */
 	CreateBuffers();
 	AllocateBuffers();
+	InitializeSrcBuffer();
+
+	/* Compute Pipeline and Shader */
+
 
 	DestroyDevice();
 	DestroyInstance();
