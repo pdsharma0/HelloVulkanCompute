@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 /*
    This is a simple compute example written in Vulkan.
@@ -79,11 +80,20 @@ const char* GetVulkanErrorString(VkResult result) {
 }
 
 // -------------- Macros --------------
-#define MESSAGE(...) printf(__VA_ARGS__);
+#define MESSAGE(...) \
+	printf(__VA_ARGS__); printf("\n");
+
+#define WARNING_MESSAGE(msg) \
+	printf("WARNING:"); \
+	MESSAGE(msg) \
+
+#define ERROR_MESSAGE(msg) \
+	printf("ERROR:"); \
+	MESSAGE(msg) \
+	exit(-1)
 
 #define VK_CHECK_RESULT(result) \
-	if (VK_SUCCESS != result) \
-	{ \
+	if (VK_SUCCESS != result) { \
 		MESSAGE("Vulkan error!\tErrorCode:%s (File:%s,LINE:%u)\n", GetVulkanErrorString(result), __FILE__, __LINE__); \
 		exit(-1); \
 	} \
@@ -120,21 +130,29 @@ const unsigned bufferSize = sizeof(unsigned) * bufferLength;
 // https://developer.nvidia.com/vulkan-memory-management
 // https://software.intel.com/en-us/articles/api-without-secrets-introduction-to-vulkan-part-5
 const unsigned memoryTypeIdx = 1;
+const bool enableStandardValidationLayer = true;
 
 // ----------------------------
 // Create vkInstance
 // ----------------------------
 void CreateInstance() {
 
+	std::vector<const char*> validationLayers;
+
 	// Setup a vkInstanceCreateInfo struct
 	VkInstanceCreateInfo instanceInfo = {};
 	instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	if (enableStandardValidationLayer) {
+		validationLayers.push_back("VK_LAYER_LUNARG_standard_validation");
+		instanceInfo.enabledLayerCount = validationLayers.size();
+		instanceInfo.ppEnabledLayerNames = validationLayers.data();
+	}
 
 	// No allocater needed for now...
 	VkResult result = vkCreateInstance(&instanceInfo, NULL, &g_Instance);
 	VK_CHECK_RESULT(result);
 
-	printf("VkInstance created!\n");
+	MESSAGE("VkInstance created.");
 }
 
 // ----------------------------
@@ -142,7 +160,7 @@ void CreateInstance() {
 // ----------------------------
 void DestroyInstance() {
 	vkDestroyInstance(g_Instance, NULL);
-	printf("VkInstance destroyed!\n");
+	MESSAGE("VkInstance destroyed.");
 }
 
 // ----------------------------
@@ -193,7 +211,7 @@ void CreateDevice() {
 		if (pQueueFamilyProperties[i].queueFlags == 14) {
 			idxQueue = i;
 		}
-		printf("QueueFamily: %d, QueueFlags: %d, QueueCount: %d\n", i, pQueueFamilyProperties[i].queueFlags, pQueueFamilyProperties[i].queueCount);
+		MESSAGE("QueueFamily: %d, QueueFlags: %d, QueueCount: %d.", i, pQueueFamilyProperties[i].queueFlags, pQueueFamilyProperties[i].queueCount);
 	}
 
 	// Set- the priority of the single compute queue
@@ -216,7 +234,7 @@ void CreateDevice() {
 	result = vkCreateDevice(g_PhysicalDevice, &deviceCreateInfo, NULL, &g_Device);
 	VK_CHECK_RESULT(result);
 
-	printf("VkDevice created!\n");
+	MESSAGE("VkDevice created.");
 }
 
 // ----------------------------
@@ -224,7 +242,7 @@ void CreateDevice() {
 // ----------------------------
 void DestroyDevice() {
 	vkDestroyDevice(g_Device, NULL);
-	printf("VkDevice destroyed!\n");
+	MESSAGE("VkDevice destroyed.");
 }
 
 // --------------------------------------------------------
@@ -249,7 +267,7 @@ void CreateBuffers() {
 	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_DstBuffer);
 	VK_CHECK_RESULT(result);
 
-	printf("Buffers created!\n");
+	MESSAGE("Buffers created.");
 }
 
 // --------------------------------------------------------
@@ -284,11 +302,27 @@ void AllocateBuffers() {
 	result = vkBindBufferMemory(g_Device, g_DstBuffer, g_DeviceMemory, g_DstBufferOffset);
 	VK_CHECK_RESULT(result);
 
-	printf("Buffers allocated!\n");
+	MESSAGE("Buffers allocated.");
+}
+
+
+// --------------------------------------------------------
+// DeAllocate Src and Dst Buffers
+// --------------------------------------------------------
+void DeAllocateBuffers() {
+	vkFreeMemory(g_Device, g_DeviceMemory, NULL);
 }
 
 // --------------------------------------------------------
-// Allocate Src Buffer
+// Destroy Src and Dst Buffers
+// --------------------------------------------------------
+void DestroyBuffers() {
+	vkDestroyBuffer(g_Device, g_SrcBuffer, NULL);
+	vkDestroyBuffer(g_Device, g_DstBuffer, NULL);
+}
+
+// --------------------------------------------------------
+// Initialize Src Buffer
 // --------------------------------------------------------
 void InitializeSrcBuffer() {
 
@@ -298,7 +332,8 @@ void InitializeSrcBuffer() {
 	VK_CHECK_RESULT(result);
 
 	if (pData == nullptr) {
-
+		MESSAGE("Memory unmapping failed.");
+		exit(-1);
 	}
 
 	// Fill the buffer with some data
@@ -309,7 +344,7 @@ void InitializeSrcBuffer() {
 	vkUnmapMemory(g_Device, g_DeviceMemory);
 	VK_CHECK_RESULT(result);
 
-	printf("Src Buffer initialized!\n");
+	MESSAGE("Src Buffer initialized.");
 }
 
 int main() {
@@ -323,9 +358,13 @@ int main() {
 	AllocateBuffers();
 	InitializeSrcBuffer();
 
-	/* Compute Pipeline and Shader */
+	/* Compute Pipeline and Shader creation */
 
 
+
+	/* Free stuff */
+	DestroyBuffers();
+	DeAllocateBuffers();
 	DestroyDevice();
 	DestroyInstance();
 	return 0;
