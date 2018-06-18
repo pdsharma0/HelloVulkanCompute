@@ -26,6 +26,9 @@ VkDeviceSize			g_SrcBufferOffset;
 VkBuffer				g_DstBuffer;
 VkDeviceSize			g_DstBufferOffset;
 
+/* Shader stuff */
+VkShaderModule          g_ComputeShader;
+
 // ------------------ Constants ------------------
 const unsigned bufferLength = 1024;
 const unsigned bufferSize = sizeof(unsigned) * bufferLength;
@@ -257,6 +260,33 @@ void InitializeSrcBuffer() {
 	VK_CHECK_RESULT(result);
 
 	MESSAGE("Src Buffer initialized.");
+}
+
+// --------------------------------------------------------
+// Create a Compute Shader
+// --------------------------------------------------------
+void CreateComputeShader() {
+
+}
+
+// --------------------------------------------------------
+// Create a Compute Pipeline
+// --------------------------------------------------------
+void CreateComputePipeline() {
+
+	// Create a VkShaderModule needed by VkPipelineShaderStageCreateInfo
+
+
+	// Create a VkPipelineShaderStageCreateInfo struct needed by VkComputePipelineCreateInfo
+	VkPipelineShaderStageCreateInfo csCreateInfo = {};
+	csCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	csCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+
+
+	// First create a VkComputePipelineCreateInfo needed by vkCreateComputePipelines()
+	VkComputePipelineCreateInfo pipelineCreateInfo = {};
+	pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+	//pipelineCreateInfo.
 }
 
 int main() {

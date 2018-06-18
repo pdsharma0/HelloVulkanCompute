@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.h>
 
+// Returns a string represenation of a VkResult enum
 const char* GetVulkanErrorString(VkResult result) {
 	switch (result) {
 	case VK_SUCCESS:

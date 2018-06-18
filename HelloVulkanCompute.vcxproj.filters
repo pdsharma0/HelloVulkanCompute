@@ -38,7 +38,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SimpleCopy.cl">
+    <None Include="resources\SimpleCopy.cl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\SimpleCopy.spir">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\SimpleCopy.spirasm">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

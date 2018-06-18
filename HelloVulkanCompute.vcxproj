@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -84,6 +84,16 @@
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
+    <PreBuildEvent>
+      <Command>$(CLANG_DEBUG_EXE_PATH)\clang.exe -cc1 -emit-spirv -triple spir-unknown-unknown -x cl -cl-std=CL1.2 -include C:\Users\priya\Code\llvm\tools\clang\lib\Headers\opencl.h -o resources\SimpleCopy.spir resources\SimpleCopy.cl
+</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate a SPIR-V shader from an OpenCL C-kernel file</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>$(SPIRV_TOOLS)\spirv-dis.exe resources\SimpleCopy.spir -o resources\SimpleCopy.spirasm</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -135,7 +145,9 @@
     <ClInclude Include="src\Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SimpleCopy.cl" />
+    <None Include="resources\SimpleCopy.cl" />
+    <None Include="resources\SimpleCopy.spir" />
+    <None Include="resources\SimpleCopy.spirasm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
