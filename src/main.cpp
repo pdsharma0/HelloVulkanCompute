@@ -4,7 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
-
+#include <fstream>
 /*
    This is a simple compute example written in Vulkan.
    All it does is copy contents from a Src buffer to a Dst.
@@ -27,11 +27,12 @@ VkBuffer				g_DstBuffer;
 VkDeviceSize			g_DstBufferOffset;
 
 /* Shader stuff */
-VkShaderModule          g_ComputeShader;
+VkShaderModule          g_ComputeShaderModule;
 
 // ------------------ Constants ------------------
 const unsigned bufferLength = 1024;
 const unsigned bufferSize = sizeof(unsigned) * bufferLength;
+const char* shaderBinaryFile = "resources\\SimpleCopy.spir";
 
 // 1. This is based on DeviceProperties.txt
 //	  This memory's heap is ~ 4 GiB and has both VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bits set
@@ -55,9 +56,19 @@ void CreateInstance() {
 
 	std::vector<const char*> validationLayers;
 
+	VkApplicationInfo appInfo = {};
+	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	appInfo.pApplicationName = "Hello Vulkan Compute";
+	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+	appInfo.pEngineName = "No Engine";
+	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+	appInfo.apiVersion = VK_API_VERSION_1_1;
+
 	// Setup a vkInstanceCreateInfo struct
 	VkInstanceCreateInfo instanceInfo = {};
 	instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	instanceInfo.pApplicationInfo = &appInfo;
+
 	if (enableStandardValidationLayer) {
 		validationLayers.push_back("VK_LAYER_LUNARG_standard_validation");
 		instanceInfo.enabledLayerCount = validationLayers.size();
@@ -265,8 +276,41 @@ void InitializeSrcBuffer() {
 // --------------------------------------------------------
 // Create a Compute Shader
 // --------------------------------------------------------
-void CreateComputeShader() {
+void CreateComputeShaderModule() {
 
+	// Load Compute-Shader SPIR-V binary
+	std::ifstream fileStream;
+	fileStream.open(shaderBinaryFile, std::ios::binary);
+	if (!fileStream.is_open()) {
+		MESSAGE("Unable to load Shader binary: %s", shaderBinaryFile);
+		exit(-1);
+	}
+
+	// Get binary size first
+	std::streampos begin = fileStream.tellg();
+	fileStream.seekg(0, std::ios::end);
+	std::streampos end = fileStream.tellg();
+	size_t fileSize = end - begin; // In Bytes
+
+	// Load file into memory
+	char* shaderBinaryData = new char[fileSize];
+
+	// Seek back to the start of the file
+	fileStream.seekg(0, std::ios::beg);
+
+	// Read binary file contents
+	fileStream.read(shaderBinaryData, fileSize);
+	fileStream.close();
+
+	// Initialize a VkShaderModuleCreateInfo struct
+	VkShaderModuleCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	createInfo.codeSize = fileSize;
+	createInfo.pCode = (const uint32_t*)shaderBinaryData;
+
+	// Create shader module
+	VkResult result = vkCreateShaderModule(g_Device, &createInfo, NULL, &g_ComputeShaderModule);
+	VK_CHECK_RESULT(result);
 }
 
 // --------------------------------------------------------
@@ -301,7 +345,7 @@ int main() {
 	InitializeSrcBuffer();
 
 	/* Compute Pipeline and Shader creation */
-
+	CreateComputeShaderModule();
 
 
 	/* Free stuff */
