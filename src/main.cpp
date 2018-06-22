@@ -32,7 +32,7 @@ VkShaderModule          g_ComputeShaderModule;
 // ------------------ Constants ------------------
 const unsigned bufferLength = 1024;
 const unsigned bufferSize = sizeof(unsigned) * bufferLength;
-const char* shaderBinaryFile = "resources\\SimpleCopy.spir";
+const char* shaderBinaryFile = "resources\\SimpleCopy.spv";
 
 // 1. This is based on DeviceProperties.txt
 //	  This memory's heap is ~ 4 GiB and has both VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bits set

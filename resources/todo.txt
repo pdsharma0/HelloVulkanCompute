@@ -2,7 +2,7 @@
 [x] Src and Dst VkBuffer objects using vkCreateBuffer()
 [x] Allocate memory: vkAllocateMemory() and bind memory: vkBindBufferMemory()
 [x] Initialize Buffer : vkMapMemory()/vkUnmapMemory()
-[ ] Compute Shader: VkShaderModule
+[x] Compute Shader: VkShaderModule
 [ ] Compute Pipeline: VkPipelineShaderStageCreateInfo -> VkComputePipelineCreateInfo -> vkCreateComputePipelines()
 [ ] Submit work using VkCommandBuffer. A VkCommandBuffer isn't created directly, it is allocated from a VkCommandPool
 [ ] Command buffers are submitted to a VkQueue. Use vkGetDeviceQueue() and vkQueueSubmit() functions.

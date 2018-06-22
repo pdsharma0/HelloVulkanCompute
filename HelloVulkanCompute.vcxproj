@@ -85,14 +85,16 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <PreBuildEvent>
-      <Command>$(CLANG_DEBUG_EXE_PATH)\clang.exe -cc1 -emit-spirv -triple spir-unknown-unknown -x cl -cl-std=CL1.2 -include C:\Users\priya\Code\llvm\tools\clang\lib\Headers\opencl.h -o resources\SimpleCopy.spir resources\SimpleCopy.cl
+      <Command>$(CLSPV_EXE_PATH)\clspv.exe resources\SimpleCopy.cl -o resources\SimpleCopy.spv
+$(CLSPV_EXE_PATH)\clspv.exe -S resources\SimpleCopy.cl -o resources\SimpleCopy.spvasm
 </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate a SPIR-V shader from an OpenCL C-kernel file</Message>
+      <Message>CLSPV: Compiling SimpleCopy.cl to SimpleCopy.spv</Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>$(SPIRV_TOOLS)\spirv-dis.exe resources\SimpleCopy.spir -o resources\SimpleCopy.spirasm</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,8 +148,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\SimpleCopy.cl" />
-    <None Include="resources\SimpleCopy.spir" />
-    <None Include="resources\SimpleCopy.spirasm" />
+    <None Include="resources\SimpleCopy.spv" />
+    <None Include="resources\SimpleCopy.spvasm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

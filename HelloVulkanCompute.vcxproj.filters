@@ -41,10 +41,10 @@
     <None Include="resources\SimpleCopy.cl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\SimpleCopy.spir">
+    <None Include="resources\SimpleCopy.spv">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\SimpleCopy.spirasm">
+    <None Include="resources\SimpleCopy.spvasm">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
