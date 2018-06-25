@@ -28,11 +28,13 @@ VkDeviceSize			g_DstBufferOffset;
 
 /* Shader stuff */
 VkShaderModule          g_ComputeShaderModule;
+VkDescriptorSetLayout   g_DescriptorSet0Layout; // Our shader only has a single descriptor set
 
 // ------------------ Constants ------------------
 const unsigned bufferLength = 1024;
 const unsigned bufferSize = sizeof(unsigned) * bufferLength;
 const char* shaderBinaryFile = "resources\\SimpleCopy.spv";
+const char* shaderEntryPoint = "CopyBuffer";
 
 // 1. This is based on DeviceProperties.txt
 //	  This memory's heap is ~ 4 GiB and has both VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bits set
@@ -70,7 +72,7 @@ void CreateInstance() {
 	instanceInfo.pApplicationInfo = &appInfo;
 
 	if (enableStandardValidationLayer) {
-		validationLayers.push_back("VK_LAYER_LUNARG_standard_validation");
+		validationLayers.push_back("VK_LAYER_LUNARG_core_validation");
 		instanceInfo.enabledLayerCount = validationLayers.size();
 		instanceInfo.ppEnabledLayerNames = validationLayers.data();
 	}
@@ -318,19 +320,24 @@ void CreateComputeShaderModule() {
 // --------------------------------------------------------
 void CreateComputePipeline() {
 
-	// Create a VkShaderModule needed by VkPipelineShaderStageCreateInfo
-
-
 	// Create a VkPipelineShaderStageCreateInfo struct needed by VkComputePipelineCreateInfo
 	VkPipelineShaderStageCreateInfo csCreateInfo = {};
 	csCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	csCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+	csCreateInfo.module = g_ComputeShaderModule;
+	csCreateInfo.pName = shaderEntryPoint;
 
+	// Descriptor set
+
+	// Pipeline layout
+
+	// Pipeline derivatives
 
 	// First create a VkComputePipelineCreateInfo needed by vkCreateComputePipelines()
 	VkComputePipelineCreateInfo pipelineCreateInfo = {};
 	pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-	//pipelineCreateInfo.
+	pipelineCreateInfo.stage = csCreateInfo;
+	//pipelineCreateInfo.layout = 
 }
 
 int main() {

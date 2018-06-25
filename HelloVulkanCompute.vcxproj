@@ -71,6 +71,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(VULKAN_SDK)\Include;$(IncludePath)</IncludePath>
+    <ExecutablePath>C:\Users\priya\Code\Vulkan-ValidationLayers\build\install\lib;$(ExecutablePath)</ExecutablePath>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+    <CustomBuildBeforeTargets>
+    </CustomBuildBeforeTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -80,22 +84,30 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib32</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(VULKAN_SDK)\Lib32\vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PreBuildEvent>
-      <Command>$(CLSPV_EXE_PATH)\clspv.exe resources\SimpleCopy.cl -o resources\SimpleCopy.spv
-$(CLSPV_EXE_PATH)\clspv.exe -S resources\SimpleCopy.cl -o resources\SimpleCopy.spvasm
-</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>CLSPV: Compiling SimpleCopy.cl to SimpleCopy.spv</Message>
+      <Message>
+      </Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
       </Command>
     </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>python Scripts\ShaderCompile.py</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Running ShaderCompile.py</Message>
+      <Outputs>null</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -144,12 +156,17 @@ $(CLSPV_EXE_PATH)\clspv.exe -S resources\SimpleCopy.cl -o resources\SimpleCopy.s
     <Text Include="resources\todo.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Header.h" />
     <ClInclude Include="src\Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\SimpleCopy.cl" />
     <None Include="resources\SimpleCopy.spv" />
     <None Include="resources\SimpleCopy.spvasm" />
+    <ResourceCompile Include="scripts\ShaderCompile.py">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ResourceCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,8 +1,13 @@
 ﻿[x] VkInstance -> VkPhysicalDevice -> VkDevice :: vkCreateInstance() → vkEnumeratePhysicalDevices() → vkCreateDevice()
 [x] Src and Dst VkBuffer objects using vkCreateBuffer()
-[x] Allocate memory: vkAllocateMemory() and bind memory: vkBindBufferMemory()
-[x] Initialize Buffer : vkMapMemory()/vkUnmapMemory()
-[x] Compute Shader: VkShaderModule
-[ ] Compute Pipeline: VkPipelineShaderStageCreateInfo -> VkComputePipelineCreateInfo -> vkCreateComputePipelines()
+[x] Allocate memory: vkAllocateMemory() and bind memory to buffers: vkBindBufferMemory()
+[x] Initialize Buffer : vkMapMemory()
+[x] Shader Stuff
+	[ ] Compute Shader: OpenCL -> SPIR-V binary -> Create a VkShaderModule
+	[ ] Python script to compile .cl file everytime it's modified
+	[ ] Descriptor Set Layout : Shader Descriptors (or Shader Resources like Buffer, Buffer View, Image View, Sampler)  
+	    are organized into Descriptor Sets and their arrangement is described by Descriptor Set Layout
+[ ] Compute Shader pipeline layout, base pipeline
+[ ] Compute Pipeline: VkPipelineShaderStageCreateInfo() -> VkComputePipelineCreateInfo() -> vkCreateComputePipelines()
 [ ] Submit work using VkCommandBuffer. A VkCommandBuffer isn't created directly, it is allocated from a VkCommandPool
 [ ] Command buffers are submitted to a VkQueue. Use vkGetDeviceQueue() and vkQueueSubmit() functions.
