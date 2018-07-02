@@ -4,7 +4,7 @@
 # Which would mean that the shader needs recompilation
 
 import sys, os, time
-from subprocess import call
+import subprocess
 
 # Get this script's location
 def get_script_path():
@@ -38,8 +38,8 @@ clspv_exe = os.path.join(clspv_path, "clspv.exe")
 
 if check_shader_modified(src, binary) == True:
     print("Shader src was modified.")
-    print("Generating {0} : {1}!".format(binary, "Failed" if call([clspv_exe, src, "-o", binary]) else "Success"))
-    print("Generating {0} : {1}!".format(disassembly, "Failed" if call([clspv_exe, "-S", src, "-o", disassembly]) else "Success"))
+    print("Generating {0} : {1}!".format(binary, "Failed" if subprocess.call([clspv_exe, src, "-o", binary]) else "Success"))
+    print("Generating {0} : {1}!".format(disassembly, "Failed" if subprocess.call([clspv_exe, "-S", src, "-o", disassembly]) else "Success"))
 else:
     print("Shader binary is upto date.")
 

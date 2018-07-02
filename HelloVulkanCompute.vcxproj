@@ -75,6 +75,7 @@
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -82,12 +83,16 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\priya\Code\SPIRV-Cross\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ErrorReporting>Send</ErrorReporting>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(VULKAN_SDK)\Lib32\vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(VULKAN_SDK)\Lib32\vulkan-1.lib;C:\Users\priya\Code\SPIRV-Cross\build\Debug\spirv-cross-core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
+      <ShowProgress>NotSet</ShowProgress>
+      <LinkStatus>false</LinkStatus>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -146,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\DescriptorSets.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -156,7 +162,7 @@
     <Text Include="resources\todo.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header.h" />
+    <ClInclude Include="src\DescriptorSets.h" />
     <ClInclude Include="src\Utils.hpp" />
   </ItemGroup>
   <ItemGroup>

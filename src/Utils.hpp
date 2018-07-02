@@ -2,6 +2,21 @@
 
 #include <vulkan/vulkan.h>
 
+// -------------- Macros --------------
+#define MESSAGE(...) printf(__VA_ARGS__); printf("\n");
+
+#define WARNING_MESSAGE(msg) printf("WARNING:"); MESSAGE(msg)
+
+#define ERROR_MESSAGE(msg) printf("ERROR:"); MESSAGE(msg) exit(-1);
+
+#define VK_CHECK_RESULT(result) \
+	if (VK_SUCCESS != result) { \
+		MESSAGE("Vulkan error!\tErrorCode:%s (File:%s,LINE:%u)\n", GetVulkanErrorString(result), __FILE__, __LINE__); \
+		exit(-1); \
+	}
+
+// -------------- Functions --------------
+
 // Returns a string represenation of a VkResult enum
 const char* GetVulkanErrorString(VkResult result) {
 	switch (result) {
@@ -71,16 +86,3 @@ const char* GetVulkanErrorString(VkResult result) {
 		return "Undefined Enum";
 	}
 }
-
-// -------------- Macros --------------
-#define MESSAGE(...) printf(__VA_ARGS__); printf("\n");
-
-#define WARNING_MESSAGE(msg) printf("WARNING:"); MESSAGE(msg)
-
-#define ERROR_MESSAGE(msg) printf("ERROR:"); MESSAGE(msg) exit(-1);
-
-#define VK_CHECK_RESULT(result) \
-	if (VK_SUCCESS != result) { \
-		MESSAGE("Vulkan error!\tErrorCode:%s (File:%s,LINE:%u)\n", GetVulkanErrorString(result), __FILE__, __LINE__); \
-		exit(-1); \
-	} \

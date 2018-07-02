@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include "DescriptorSets.h"
+
 /*
    This is a simple compute example written in Vulkan.
    All it does is copy contents from a Src buffer to a Dst.
@@ -27,14 +29,16 @@ VkBuffer				g_DstBuffer;
 VkDeviceSize			g_DstBufferOffset;
 
 /* Shader stuff */
+char*					g_ShaderBinaryData;
+size_t					g_ShaderBinarySize; // Bytes
 VkShaderModule          g_ComputeShaderModule;
 VkDescriptorSetLayout   g_DescriptorSet0Layout; // Our shader only has a single descriptor set
 
 // ------------------ Constants ------------------
-const unsigned bufferLength = 1024;
-const unsigned bufferSize = sizeof(unsigned) * bufferLength;
-const char* shaderBinaryFile = "resources\\SimpleCopy.spv";
-const char* shaderEntryPoint = "CopyBuffer";
+const unsigned g_BufferLength = 1024;
+const unsigned g_BufferSize = sizeof(unsigned) * g_BufferLength;
+const char* g_ShaderBinaryFile = "resources\\SimpleCopy.spv";
+const char* g_ShaderEntryPoint = "CopyBuffer";
 
 // 1. This is based on DeviceProperties.txt
 //	  This memory's heap is ~ 4 GiB and has both VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bits set
@@ -183,14 +187,14 @@ void CreateBuffers() {
 	// First create a vkBufferCreateInfo struct which is used in vkCreateBuffer 
 	VkBufferCreateInfo bufferCreateInfo = {};
 	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferCreateInfo.size = bufferSize;
+	bufferCreateInfo.size = g_BufferSize;
 	bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	// Create Src Buffer
 	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_SrcBuffer);
 	VK_CHECK_RESULT(result);
-	
+
 	// Create Dst Buffer
 	result = vkCreateBuffer(g_Device, &bufferCreateInfo, NULL, &g_DstBuffer);
 	VK_CHECK_RESULT(result);
@@ -213,7 +217,7 @@ void AllocateBuffers() {
 	// Allocate memory
 	VkMemoryAllocateInfo memAllocInfo = {};
 	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memAllocInfo.allocationSize = 2 * bufferSize;
+	memAllocInfo.allocationSize = 2 * g_BufferSize;
 	memAllocInfo.memoryTypeIndex = memoryTypeIdx;
 
 	VkResult result = vkAllocateMemory(g_Device, &memAllocInfo, NULL, &g_DeviceMemory);
@@ -221,7 +225,7 @@ void AllocateBuffers() {
 
 	// Store the buffers next to each other
 	g_SrcBufferOffset = 0;
-	g_DstBufferOffset = bufferSize;
+	g_DstBufferOffset = g_BufferSize;
 
 	// Bind memory to buffers
 	result = vkBindBufferMemory(g_Device, g_SrcBuffer, g_DeviceMemory, g_SrcBufferOffset);
@@ -256,7 +260,7 @@ void InitializeSrcBuffer() {
 
 	unsigned* pData = nullptr;
 	// Map the Src Buffer to CPU Memory
-	VkResult result = vkMapMemory(g_Device, g_DeviceMemory, g_SrcBufferOffset, bufferSize, 0, (void**)&pData);
+	VkResult result = vkMapMemory(g_Device, g_DeviceMemory, g_SrcBufferOffset, g_BufferSize, 0, (void**)&pData);
 	VK_CHECK_RESULT(result);
 
 	if (pData == nullptr) {
@@ -265,7 +269,7 @@ void InitializeSrcBuffer() {
 	}
 
 	// Fill the buffer with some data
-	for (unsigned i = 0; i < bufferLength; i++) {
+	for (unsigned i = 0; i < g_BufferLength; i++) {
 		pData[i] = i;
 	}
 
@@ -282,9 +286,9 @@ void CreateComputeShaderModule() {
 
 	// Load Compute-Shader SPIR-V binary
 	std::ifstream fileStream;
-	fileStream.open(shaderBinaryFile, std::ios::binary);
+	fileStream.open(g_ShaderBinaryFile, std::ios::binary);
 	if (!fileStream.is_open()) {
-		MESSAGE("Unable to load Shader binary: %s", shaderBinaryFile);
+		MESSAGE("Unable to load Shader binary: %s", g_ShaderBinaryFile);
 		exit(-1);
 	}
 
@@ -292,27 +296,35 @@ void CreateComputeShaderModule() {
 	std::streampos begin = fileStream.tellg();
 	fileStream.seekg(0, std::ios::end);
 	std::streampos end = fileStream.tellg();
-	size_t fileSize = end - begin; // In Bytes
+	g_ShaderBinarySize = end - begin; // In Bytes
 
 	// Load file into memory
-	char* shaderBinaryData = new char[fileSize];
+	g_ShaderBinaryData = new char[g_ShaderBinarySize];
 
 	// Seek back to the start of the file
 	fileStream.seekg(0, std::ios::beg);
 
 	// Read binary file contents
-	fileStream.read(shaderBinaryData, fileSize);
+	fileStream.read(g_ShaderBinaryData, g_ShaderBinarySize);
 	fileStream.close();
 
 	// Initialize a VkShaderModuleCreateInfo struct
 	VkShaderModuleCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	createInfo.codeSize = fileSize;
-	createInfo.pCode = (const uint32_t*)shaderBinaryData;
+	createInfo.codeSize = g_ShaderBinarySize;
+	createInfo.pCode = (const uint32_t*)g_ShaderBinaryData;
 
 	// Create shader module
 	VkResult result = vkCreateShaderModule(g_Device, &createInfo, NULL, &g_ComputeShaderModule);
 	VK_CHECK_RESULT(result);
+}
+
+// --------------------------------------------------------
+// Create a Descriptor Set Layout
+// --------------------------------------------------------
+void CreateDescriptorSetLayout() {
+	ParseSPIRVBinary(g_ShaderBinaryData, g_ShaderBinarySize);
+	GetKernelResources();
 }
 
 // --------------------------------------------------------
@@ -325,7 +337,7 @@ void CreateComputePipeline() {
 	csCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	csCreateInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
 	csCreateInfo.module = g_ComputeShaderModule;
-	csCreateInfo.pName = shaderEntryPoint;
+	csCreateInfo.pName = g_ShaderEntryPoint;
 
 	// Descriptor set
 
@@ -353,7 +365,7 @@ int main() {
 
 	/* Compute Pipeline and Shader creation */
 	CreateComputeShaderModule();
-
+	CreateDescriptorSetLayout();
 
 	/* Free stuff */
 	DestroyBuffers();
