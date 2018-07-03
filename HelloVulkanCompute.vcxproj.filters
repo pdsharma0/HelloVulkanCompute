@@ -21,9 +21,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DescriptorSets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\MemoryMapping.png">
@@ -42,9 +39,6 @@
     <ClInclude Include="src\Utils.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DescriptorSets.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\SimpleCopy.cl">
@@ -54,6 +48,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="resources\SimpleCopy.spvasm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\SimpleCopy-map.csv">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

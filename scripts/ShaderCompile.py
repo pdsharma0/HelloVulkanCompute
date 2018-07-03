@@ -38,7 +38,8 @@ clspv_exe = os.path.join(clspv_path, "clspv.exe")
 
 if check_shader_modified(src, binary) == True:
     print("Shader src was modified.")
-    print("Generating {0} : {1}!".format(binary, "Failed" if subprocess.call([clspv_exe, src, "-o", binary]) else "Success"))
+    clspv_descriptor_map_arg = "-descriptormap={0}-map.csv".format(src[0:-3])
+    print("Generating {0} : {1}!".format(binary, "Failed" if subprocess.call([clspv_exe, src, "-o", binary, clspv_descriptor_map_arg]) else "Success"))
     print("Generating {0} : {1}!".format(disassembly, "Failed" if subprocess.call([clspv_exe, "-S", src, "-o", disassembly]) else "Success"))
 else:
     print("Shader binary is upto date.")

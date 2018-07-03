@@ -9,7 +9,7 @@
 	OpExtension "SPV_KHR_variable_pointers"
 	OpMemoryModel Logical GLSL450
 	OpEntryPoint GLCompute %15 "CopyBuffer" %12
-	OpExecutionMode %15 LocalSize 32 1 1
+	OpExecutionMode %15 LocalSize 64 1 1
 	OpSource OpenCL_C 120
 	OpDecorate %3 ArrayStride 4
 	OpMemberDecorate %4 0 Offset 0

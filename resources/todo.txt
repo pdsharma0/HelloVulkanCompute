@@ -5,11 +5,8 @@
 [x] Shader Stuff
 	[x] Compute Shader: OpenCL -> SPIR-V binary -> Create a VkShaderModule
 	[x] Python script to compile .cl file everytime it's modified
-	[ ] Descriptor Set Layout : Shader Descriptors (or Shader Resources like Buffer, Buffer View, Image View, Sampler)  
+	[x] Descriptor Set Layout : Shader Descriptors (or Shader Resources like Buffer, Buffer View, Image View, Sampler)  
 	    are organized into Descriptor Sets and their arrangement is described by Descriptor Set Layout-
-	[ ] Automatic Shader Resources Management
-		[ ] Shader Reflection using SPIRV-Cross tool
-		[ ] Descriptor Set and Layout creation
 [ ] Compute Shader pipeline layout, base pipeline
 [ ] Compute Pipeline: VkPipelineShaderStageCreateInfo() -> VkComputePipelineCreateInfo() -> vkCreateComputePipelines()
 [ ] Submit work using VkCommandBuffer. A VkCommandBuffer isn't created directly, it is allocated from a VkCommandPool

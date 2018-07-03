@@ -151,7 +151,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\DescriptorSets.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -162,10 +161,10 @@
     <Text Include="resources\todo.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\DescriptorSets.h" />
     <ClInclude Include="src\Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\SimpleCopy-map.csv" />
     <None Include="resources\SimpleCopy.cl" />
     <None Include="resources\SimpleCopy.spv" />
     <None Include="resources\SimpleCopy.spvasm" />
