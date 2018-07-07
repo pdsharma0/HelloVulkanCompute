@@ -159,6 +159,7 @@
   <ItemGroup>
     <Text Include="resources\rx480_vulkan_features.txt" />
     <Text Include="resources\todo.txt" />
+    <Text Include="Vulkan Architecture.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Utils.hpp" />

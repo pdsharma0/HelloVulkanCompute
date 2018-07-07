@@ -5,9 +5,18 @@
 [x] Shader Stuff
 	[x] Compute Shader: OpenCL -> SPIR-V binary -> Create a VkShaderModule
 	[x] Python script to compile .cl file everytime it's modified
-	[x] Descriptor Set Layout : Shader Descriptors (or Shader Resources like Buffer, Buffer View, Image View, Sampler)  
-	    are organized into Descriptor Sets and their arrangement is described by Descriptor Set Layout-
-[ ] Compute Shader pipeline layout, base pipeline
-[ ] Compute Pipeline: VkPipelineShaderStageCreateInfo() -> VkComputePipelineCreateInfo() -> vkCreateComputePipelines()
-[ ] Submit work using VkCommandBuffer. A VkCommandBuffer isn't created directly, it is allocated from a VkCommandPool
-[ ] Command buffers are submitted to a VkQueue. Use vkGetDeviceQueue() and vkQueueSubmit() functions.
+	[x] Descriptor Set Layout : Shader Descriptors
+	[ ] Descriptor Pool
+	[ ] Descriptor Allocation
+[x] (Program State) Compute Pipeline
+	[x] VkPipelineShaderStageCreateInfo
+	[x] VkPipelineLayoutCreateInfo
+	[x] VkComputePipelineCreateInfo
+	[x] vkCreateComputePipelines()
+[ ] VkPipelines are bound to VkCommandBuffer which are created using a VkCommandPool.
+[ ] Compute Dispatches are recorded into Command Buffers
+[ ] VkCommandBuffer are submitted to a VkQueue. Use vkGetDeviceQueue() and vkQueueSubmit() functions.
+
+
+
+

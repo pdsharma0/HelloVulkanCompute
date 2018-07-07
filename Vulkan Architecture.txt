@@ -1,0 +1,13 @@
+Vulkan architecture:
+
+------------------------------------------------------------------
+1. Relationship between Host, Device, PhysicalDevice and Instance 
+------------------------------------------------------------------
+
+* Vulkan is mainly a Host <-> Device interaction API.
+* A Host is typically a CPU which is a general-purpose Device. It acts as the master which 
+  controls various slave Devices in a System. It basically sends work to these Devices to 
+  do a particular task. Each device can handle a set of tasks more efficiently. For example, 
+  A GPU handles rendering and data-parallel tasks better than a CPU for example which focuses
+  on handling a complex task better.
+* 
